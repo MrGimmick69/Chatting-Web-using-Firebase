@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": "public",
+    "site": "notisecretmsg",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
+
