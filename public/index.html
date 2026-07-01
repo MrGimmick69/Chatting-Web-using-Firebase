@@ -51,7 +51,7 @@
 
         <button type="submit" id="auth-submit" class="btn-primary">Log In</button>
       </form>
-
+      
       <p class="auth-toggle">
         <span id="toggle-text">Don't have an account?</span>
         <a href="#" id="toggle-link">Sign Up</a>
@@ -70,7 +70,12 @@
             <div class="me-status">Online</div>
           </div>
         </div>
-        <button id="logout-btn" class="icon-btn" title="Log Off">⎋</button>
+        <button id="logout-btn" class="icon-btn" title="Log Off">
+          <img src="prop/logout.png" alt="Log Off" style="width:14px;height:14px;object-fit:contain;" />
+        </button>
+        <button id="admin-btn" class="icon-btn hidden" onclick="window.location.href='admin.html'" title="Admin Panel" style="display:flex;align-items:center;justify-content:center;padding:4px;">
+          <img src="prop/admin.png" alt="Admin Console" style="width:14px;height:14px;object-fit:contain;" />
+        </button>
       </div>
 
       <div class="sidebar-search">
@@ -85,8 +90,8 @@
         <button id="open-sidebar-btn" class="icon-btn mobile-only">☰</button>
         <div class="empty-content">
           <div class="empty-icon">💬</div>
-          <h2>Pilih teman untuk mulai chat</h2>
-          <p>Pesan kamu akan tersimpan otomatis</p>
+          <h2>Select a friend to start chatting</h2>
+          <p>Your messages will be saved automatically</p>
         </div>
       </div>
 

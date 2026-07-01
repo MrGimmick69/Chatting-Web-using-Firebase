@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - Chat History</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js",
+      "firebase/database": "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"
+    }
+  }
+  </script>
+  <style>
+    body {
+      min-height: 100vh;
+      overflow: auto;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .admin-shell {
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-card {
+      width: min(1100px, 100%);
+      min-height: 75vh;
+      display: flex;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.35);
+      box-shadow: 0 10px 35px rgba(74,53,58,0.16);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .admin-sidebar {
+      width: 300px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .admin-sidebar-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .admin-list {
+      list-style: none;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+    }
+
+    .admin-room {
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.7);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .admin-room:hover {
+      transform: translateY(-1px);
+      border-color: var(--border);
+    }
+
+    .admin-room.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .admin-room-title {
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-room-preview {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.55);
+    }
+
+    .admin-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.5);
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .header-info {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .admin-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .admin-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-dim);
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .admin-msg {
+      max-width: 70%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(74,53,58,0.08);
+      align-self: flex-start;
+    }
+
+    .admin-msg.mine {
+      align-self: flex-end;
+      background: var(--accent);
+      color: white;
+    }
+
+    .admin-msg-meta {
+      font-size: 11px;
+      margin-top: 4px;
+      opacity: 0.75;
+    }
+
+    .timeline-date {
+      text-align: center;
+      margin: 8px 0 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .timeline-recipient {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 2px 0 6px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .auth-error {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+      color: var(--danger);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .admin-card {
+        flex-direction: column;
+        min-height: auto;
+      }
+
+      .admin-sidebar {
+        width: 100%;
+        max-height: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="authError" class="auth-error" style="display: none;"></div>
+
+  <div id="adminPanel" class="admin-shell" style="display: none;">
+    <div class="admin-card">
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">💬 Conversations</div>
+        <ul class="admin-list" id="chatRoomList">
+          <li class="admin-empty">Loading chats...</li>
+        </ul>
+      </aside>
+
+      <section class="admin-main">
+        <div class="admin-header">
+          <div>
+            <div class="header-title" id="headerTitle">Select a conversation</div>
+            <div class="header-info" id="headerInfo"></div>
+          </div>
+          <button id="backToChatBtn" class="icon-btn" title="Back to chat">←</button>
+        </div>
+
+        <div class="admin-messages" id="messagesContainer">
+          <div class="admin-empty">Pilih percakapan untuk melihat isi chat.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

@@ -157,10 +157,25 @@ authForm.addEventListener("submit", async (e) => {
 
 // ---------- Auth state ----------
 onAuthStateChanged(auth, async (user) => {
-  if (user) {
+if (user) {
     const snap = await get(ref(db, `users/${user.uid}`));
     const data = snap.exists() ? snap.val() : { username: user.email.split("@")[0] };
     currentUser = { uid: user.uid, username: data.username };
+
+    // ==========================================
+    // LOGIKA TOMBOL ADMIN (Hanya untuk 'noti')
+    // ==========================================
+    const adminBtn = document.getElementById("admin-btn");
+    console.log("YANG LOGIN SEKARANG:", currentUser.username);
+    console.log("TOMBOL KETEMU GA:", adminBtn);
+    if (adminBtn) {
+      if (currentUser.username === "Noti") {
+        adminBtn.classList.remove("hidden"); // Munculkan tombol jika admin
+      } else {
+        adminBtn.classList.add("hidden");    // Sembunyikan jika bukan admin
+      }
+    }
+    // ==========================================
 
     // presence: update lastSeen now and ensure onDisconnect updates it
     const meLastSeenRef = ref(db, `users/${user.uid}/lastSeen`);
@@ -183,9 +198,9 @@ onAuthStateChanged(auth, async (user) => {
         onDisconnect(meLastSeenRef).set(serverTimestamp());
       }
     });
-
     showChatScreen();
-  } else {
+  }
+    else {
     // user signed out — mark previous user offline and update lastSeen
     if (currentUser && currentUser.uid) {
       set(ref(db, `users/${currentUser.uid}/online`), false).catch(() => {});

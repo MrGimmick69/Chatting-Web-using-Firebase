@@ -116,6 +116,18 @@ input:focus { border-color: var(--accent); }
   flex-shrink: 0;
 }
 
+/* ============ Tombol Admin Spesial ============ */
+#admin-btn {
+  color: #fca311; 
+}
+
+#admin-btn:hover {
+  /* Efek hover yang senada dengan warnanya */
+  background: rgba(252, 163, 17, 0.15);
+  color: #ffb703;
+  transform: scale(1.1); /* Agak membesar dikit pas disorot */
+}
+
 .sidebar-header {
   display: flex;
   align-items: center;
